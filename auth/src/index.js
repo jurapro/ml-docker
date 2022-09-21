@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const {connectDB} = require("./helpers/db");
-const {host, port, db} = require("./configuration");
+const {host, port, db, apiUrl} = require("./configuration");
+const axios = require("axios");
 
 
 const startServer = () => {
@@ -23,6 +24,14 @@ app.get("/api/getCurrentUser", (req, res) => {
     })
 })
 
+app.get("/testwithapidata", (req, res) => {
+    axios.get(`${apiUrl}/testapidata`)
+        .then((response) => {
+            res.json({
+                testapidata: response.data.testwithapi
+            });
+        })
+})
 connectDB()
     .on("error", console.log)
     .on("disconnected", connectDB)

@@ -1,11 +1,14 @@
 version: "3"
 
 services:
+
   frontend:
     build: ./frontend
     container_name: ml-docker-frontend
     command: serve -s build -l 3000
     restart: unless-stopped
+    networks:
+      - ml-docker-network
 
   api:
     build: ./api
@@ -21,6 +24,8 @@ services:
       - AUTH_API_URL=http://auth:3002/api
     depends_on:
       - api_db
+    networks:
+      - ml-docker-network
 
   auth:
     build: ./auth
@@ -33,20 +38,27 @@ services:
       - PORT=3002
       - HOST=http://ml-docker.com
       - MONGO_URL=mongodb://auth_db:27017/auth
+      - API_URL=http://api:3001/api
     depends_on:
       - auth_db
+    networks:
+      - ml-docker-network
 
   api_db:
     image: mongo:latest
     container_name: ml-docker-api-db
     volumes:
       - mongodb_api:/data/db
+    networks:
+      - ml-docker-network
 
   auth_db:
     image: mongo:latest
     container_name: ml-docker-auth-db
     volumes:
       - mongodb_auth:/data/db
+    networks:
+      - ml-docker-network
 
   nginx:
     image: nginx:stable-alpine
@@ -57,7 +69,13 @@ services:
       - ./nginx/nginx.conf.prod:/etc/nginx/conf.d/nginx.conf
     depends_on:
       - frontend
+    networks:
+      - ml-docker-network
 
 volumes:
   mongodb_api:
   mongodb_auth:
+
+networks:
+  ml-docker-network:
+    driver: bridge
