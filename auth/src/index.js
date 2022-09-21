@@ -16,6 +16,13 @@ app.get("/test", (req, res) => {
     res.send("Auth service working!");
 })
 
+app.get("/api/getCurrentUser", (req, res) => {
+    res.json({
+        id: "123",
+        email: "foo@gmail.com",
+    })
+})
+
 connectDB()
     .on("error", console.log)
     .on("disconnected", connectDB)

@@ -1,35 +1,31 @@
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
+const axios = require("axios");
+//const mongoose = require("mongoose");
 const {connectDB} = require("./helpers/db");
-const {host, port, db} = require("./configuration");
+const {host, port, db, authApiUrl} = require("./configuration");
 
-
-const postSchema = new mongoose.Schema({
-    name: String
-});
-const Post = mongoose.model('Post', postSchema);
 
 const startServer = () => {
     app.listen(port, async () => {
         console.log(`Starting api service on port: ${port}`);
         console.log(`On host: ${host}`);
         console.log(`Our database: ${db}`);
-
-/*        const silence = new Post({name: 'Silence'});
-        console.log(silence.name);
-
-        await silence.save();
-        const kittens = await Post.find();
-
-        console.log(kittens);*/
-
-
     })
 }
 
 app.get("/test", (req, res) => {
     res.send("Api service working!");
+})
+
+app.get("/testwithcurrentuser", (req, res) => {
+    axios.get(`${authApiUrl}/getCurrentUser`)
+        .then((response) => {
+            res.json({
+                testWithCurrentUser: true,
+                currentUserFromAuth: response.data
+            });
+        })
 })
 
 connectDB()
